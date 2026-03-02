@@ -25,7 +25,7 @@ const GALLERY = [
   { src: "/images/gallery-3.png", alt: "Diamond Pendant Necklace", caption: "Diamond Pendant" },
   { src: "/images/gallery-4.png", alt: "Custom Diamond Bracelet", caption: "Custom Bracelet" },
   { src: "/images/gallery-5.png", alt: "Luxury Timepiece", caption: "Luxury Watch" },
-  { src: "/images/gallery-6.png", alt: "Master Jeweler at Work", caption: "Craftsmanship" },
+  { src: "/images/gallery-6.png", alt: "Diamond Drop Earrings", caption: "Diamond Earrings" },
 ];
 
 const SERVICES = [
@@ -45,34 +45,27 @@ const TESTIMONIALS = [
 
 /* ═══ HOOKS ═══ */
 
-function useInView(threshold = 0.1) {
+/** CSS-based reveal: content visible by default, JS adds animation classes */
+function useReveal(extraClass?: string) {
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(true);
-  const [ready, setReady] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight && rect.bottom > 0) {
-      setVisible(true);
-      setReady(true);
-      return;
-    }
-    setVisible(false);
-    setReady(true);
+    if (extraClass) el.classList.add(extraClass);
+    el.classList.add("reveal-ready");
     const obs = new IntersectionObserver(
       ([e]) => {
         if (e.isIntersecting) {
-          setVisible(true);
+          el.classList.add("revealed");
           obs.disconnect();
         }
       },
-      { threshold, rootMargin: "0px 0px -40px 0px" }
+      { threshold: 0.08, rootMargin: "0px 0px -30px 0px" }
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, [threshold]);
-  return { ref, visible, ready };
+  }, [extraClass]);
+  return ref;
 }
 
 /* ═══ PAGE ═══ */
@@ -105,16 +98,13 @@ export default function Home() {
     return () => window.removeEventListener("keydown", lbKey);
   }, [lbKey]);
 
-  const heroV = useInView(0.05);
-  const galleryV = useInView(0.08);
-  const servicesV = useInView(0.08);
-  const aboutV = useInView(0.12);
-  const testimonialsV = useInView(0.08);
-  const ctaV = useInView(0.12);
-
-  // Only apply hidden state after JS hydration for below-fold elements
-  const anim = (v: boolean, r: boolean = true) =>
-    !r || v ? "translate-y-0 opacity-100" : "translate-y-7 opacity-0";
+  // Reveal refs — content visible by default, JS enhances with scroll animations
+  const galleryRef = useReveal();
+  const servicesRef = useReveal();
+  const aboutLeftRef = useReveal("reveal-left");
+  const aboutRightRef = useReveal("reveal-right");
+  const testimonialsRef = useReveal();
+  const ctaRef = useReveal();
 
   return (
     <>
@@ -147,14 +137,14 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* HERO */}
-      <section ref={heroV.ref} className="relative flex h-screen min-h-[640px] max-h-[1100px] items-center justify-center overflow-hidden">
+      {/* HERO — always visible, uses CSS animation */}
+      <section className="relative flex h-screen min-h-[640px] max-h-[1100px] items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <Image src="/images/hero.png" alt="Brilliant diamond ring" fill className="object-cover" priority quality={90} sizes="100vw" />
           <div className="absolute inset-0 bg-gradient-to-b from-primary/60 via-primary/35 to-primary/70" />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent" />
         </div>
-        <div className={`relative z-10 max-w-3xl px-6 text-center transition-all duration-1000 ${anim(heroV.visible, heroV.ready)}`}>
+        <div className="relative z-10 max-w-3xl px-6 text-center animate-fade-up">
           <p className="mb-6 text-[11px] md:text-[12px] font-medium uppercase tracking-[0.4em] text-accent gold-lines">Est. Lakewood, NJ</p>
           <h1 className="font-heading text-[36px] leading-[1.15] text-white sm:text-5xl md:text-6xl lg:text-7xl">
             Timeless Elegance,<br /><span className="text-gold-gradient">Crafted for You</span>
@@ -177,16 +167,16 @@ export default function Home() {
       </section>
 
       {/* GALLERY */}
-      <section id="collection" ref={galleryV.ref} className="bg-light py-20 sm:py-24 md:py-28">
-        <div className="mx-auto max-w-7xl px-5 md:px-10">
-          <div className={`mb-14 sm:mb-16 text-center transition-all duration-700 ${anim(galleryV.visible, galleryV.ready)}`}>
+      <section id="collection" className="bg-light py-20 sm:py-24 md:py-28">
+        <div ref={galleryRef} className="mx-auto max-w-7xl px-5 md:px-10">
+          <div className="mb-14 sm:mb-16 text-center">
             <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-accent">Our Collection</p>
             <h2 className="font-heading text-3xl sm:text-4xl md:text-[42px] text-primary gold-underline">Curated Masterpieces</h2>
             <p className="mx-auto mt-8 max-w-xl text-[15px] font-light leading-relaxed text-text-light">Each piece tells a story of exceptional craftsmanship. Click any piece to explore it in full detail.</p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 lg:gap-5">
             {GALLERY.map((item, i) => (
-              <button key={item.src} onClick={() => setLightbox(i)} className={`group relative overflow-hidden bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-all duration-700 ${anim(galleryV.visible, galleryV.ready)}`} style={{ transitionDelay: galleryV.visible ? `${120 + i * 80}ms` : "0ms" }} aria-label={`View ${item.caption}`}>
+              <button key={item.src} onClick={() => setLightbox(i)} className="group relative overflow-hidden bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-accent" aria-label={`View ${item.caption}`}>
                 <div className="relative aspect-square overflow-hidden">
                   <Image src={item.src} alt={item.alt} fill className="object-cover transition-transform duration-700 group-hover:scale-105" sizes="(max-width: 640px) 50vw, 33vw" />
                   <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/40 transition-all duration-500" />
@@ -228,15 +218,15 @@ export default function Home() {
       )}
 
       {/* SERVICES */}
-      <section id="services" ref={servicesV.ref} className="bg-white py-20 sm:py-24 md:py-28">
-        <div className="mx-auto max-w-7xl px-5 md:px-10">
-          <div className={`mb-14 sm:mb-16 text-center transition-all duration-700 ${anim(servicesV.visible, servicesV.ready)}`}>
+      <section id="services" className="bg-white py-20 sm:py-24 md:py-28">
+        <div ref={servicesRef} className="mx-auto max-w-7xl px-5 md:px-10">
+          <div className="mb-14 sm:mb-16 text-center">
             <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-accent">What We Offer</p>
             <h2 className="font-heading text-3xl sm:text-4xl md:text-[42px] text-primary gold-underline">Our Expertise</h2>
           </div>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
-            {SERVICES.map((s, i) => (
-              <div key={s.title} className={`group border border-border p-7 sm:p-8 transition-all duration-700 hover:border-accent/30 hover:shadow-lg ${anim(servicesV.visible, servicesV.ready)}`} style={{ transitionDelay: servicesV.visible ? `${120 + i * 70}ms` : "0ms" }}>
+            {SERVICES.map((s) => (
+              <div key={s.title} className="group border border-border p-7 sm:p-8 transition-all duration-500 hover:border-accent/30 hover:shadow-lg">
                 <div className="mb-5 text-accent transition-transform duration-300 group-hover:scale-110">
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><path d={s.icon} /></svg>
                 </div>
@@ -249,17 +239,17 @@ export default function Home() {
       </section>
 
       {/* ABOUT */}
-      <section id="about" ref={aboutV.ref} className="bg-primary py-20 sm:py-24 md:py-28 overflow-hidden">
+      <section id="about" className="bg-primary py-20 sm:py-24 md:py-28 overflow-hidden">
         <div className="mx-auto max-w-7xl px-5 md:px-10">
           <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16 xl:gap-20">
-            <div className={`relative transition-all duration-[900ms] ${!aboutV.ready || aboutV.visible ? "translate-x-0 opacity-100" : "-translate-x-10 opacity-0"}`}>
+            <div ref={aboutLeftRef} className="relative">
               <div className="relative aspect-[4/3] lg:aspect-[3/4] overflow-hidden shadow-2xl">
                 <Image src="/images/showroom.png" alt="Eternity Jewelers showroom" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
               </div>
               <div className="absolute top-4 left-4 h-16 w-16 border-t border-l border-accent/50" />
               <div className="absolute bottom-4 right-4 h-16 w-16 border-b border-r border-accent/50" />
             </div>
-            <div className={`transition-all duration-[900ms] ${!aboutV.ready || aboutV.visible ? "translate-x-0 opacity-100" : "translate-x-10 opacity-0"}`} style={{ transitionDelay: "200ms" }}>
+            <div ref={aboutRightRef}>
               <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-accent">Our Story</p>
               <h2 className="font-heading text-3xl sm:text-4xl md:text-[42px] leading-[1.2] text-white">36 Years of<br /><span className="text-gold-gradient">Enduring Craftsmanship</span></h2>
               <div className="mt-5 mb-7 h-px w-16 bg-accent/50" />
@@ -279,15 +269,15 @@ export default function Home() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section id="testimonials" ref={testimonialsV.ref} className="bg-light-warm py-20 sm:py-24 md:py-28">
-        <div className="mx-auto max-w-4xl px-5 md:px-10">
-          <div className={`mb-14 sm:mb-16 text-center transition-all duration-700 ${anim(testimonialsV.visible, testimonialsV.ready)}`}>
+      <section id="testimonials" className="bg-light-warm py-20 sm:py-24 md:py-28">
+        <div ref={testimonialsRef} className="mx-auto max-w-4xl px-5 md:px-10">
+          <div className="mb-14 sm:mb-16 text-center">
             <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-accent">Client Stories</p>
             <h2 className="font-heading text-3xl sm:text-4xl md:text-[42px] text-primary gold-underline">Words of Trust</h2>
           </div>
           <div className="space-y-14 md:space-y-16">
-            {TESTIMONIALS.map((t, i) => (
-              <div key={t.author} className={`text-center transition-all duration-700 ${anim(testimonialsV.visible, testimonialsV.ready)}`} style={{ transitionDelay: testimonialsV.visible ? `${200 + i * 180}ms` : "0ms" }}>
+            {TESTIMONIALS.map((t) => (
+              <div key={t.author} className="text-center">
                 <svg className="mx-auto mb-5 h-8 w-8 text-accent/25" viewBox="0 0 24 24" fill="currentColor"><path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179z" /></svg>
                 <blockquote className="font-heading text-xl leading-[1.6] italic text-primary/85 sm:text-[22px] md:text-[25px] md:leading-[1.55]">&ldquo;{t.text}&rdquo;</blockquote>
                 <div className="mt-6">
@@ -302,16 +292,16 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section id="contact" ref={ctaV.ref} className="relative bg-primary py-20 sm:py-24 md:py-28 overflow-hidden">
+      <section id="contact" className="relative bg-primary py-20 sm:py-24 md:py-28 overflow-hidden">
         <div className="absolute inset-0 opacity-[0.02]"><div className="h-full w-full" style={{ backgroundImage: "radial-gradient(circle at 30% 30%, rgba(201,169,98,0.5) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(201,169,98,0.3) 0%, transparent 50%)" }} /></div>
-        <div className="relative mx-auto max-w-5xl px-5 md:px-10">
-          <div className={`text-center transition-all duration-700 ${anim(ctaV.visible, ctaV.ready)}`}>
+        <div ref={ctaRef} className="relative mx-auto max-w-5xl px-5 md:px-10">
+          <div className="text-center">
             <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-accent">Visit Our Showroom</p>
             <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl text-white">Begin Your Journey</h2>
             <div className="section-divider mt-5 mb-6" />
             <p className="mx-auto mb-12 max-w-xl text-[15px] font-light leading-relaxed text-white/50">Step into our showroom and experience the difference that 36 years of passion and expertise makes. Every visit begins with a personal consultation — because your story deserves a jeweler who listens.</p>
           </div>
-          <div className={`grid grid-cols-1 gap-5 sm:grid-cols-3 sm:gap-6 mb-12 transition-all duration-700 ${anim(ctaV.visible, ctaV.ready)}`} style={{ transitionDelay: "200ms" }}>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 sm:gap-6 mb-12">
             <div className="border border-white/[0.08] p-7 sm:p-8 text-center hover:border-accent/20 transition-colors">
               <svg className="mx-auto mb-4 h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
               <h3 className="font-heading text-lg text-white mb-3">Hours</h3>
@@ -328,7 +318,7 @@ export default function Home() {
               <a href={PHONE_HREF} className="text-sm font-light text-white/40 hover:text-accent transition-colors">{PHONE}</a>
             </div>
           </div>
-          <div className={`flex flex-col items-center gap-4 sm:flex-row sm:justify-center transition-all duration-700 ${anim(ctaV.visible, ctaV.ready)}`} style={{ transitionDelay: "300ms" }}>
+          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <a href={PHONE_HREF} className="btn-gold inline-flex items-center gap-3 bg-accent px-10 py-3.5 text-[13px] font-medium uppercase tracking-[0.15em] text-primary hover:bg-accent-light transition-colors">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" /></svg>
               Call Now
