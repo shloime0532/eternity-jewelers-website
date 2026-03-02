@@ -47,10 +47,21 @@ const TESTIMONIALS = [
 
 function useInView(threshold = 0.12) {
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true); // visible by default (SSR/no-JS fallback)
+  const [ready, setReady] = useState(false); // tracks if JS hydration is done
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // Check if element is already in viewport
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      setVisible(true);
+      setReady(true);
+      return;
+    }
+    // Not in viewport — hide it, then reveal on scroll
+    setVisible(false);
+    setReady(true);
     const obs = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
       { threshold }
@@ -58,7 +69,7 @@ function useInView(threshold = 0.12) {
     obs.observe(el);
     return () => obs.disconnect();
   }, [threshold]);
-  return { ref, visible };
+  return { ref, visible, ready };
 }
 
 /* ═══ PAGE ═══ */
@@ -98,8 +109,9 @@ export default function Home() {
   const testimonialsV = useInView(0.08);
   const ctaV = useInView(0.12);
 
-  const anim = (v: boolean) =>
-    v ? "translate-y-0 opacity-100" : "translate-y-7 opacity-0";
+  // Only apply hidden state after JS hydration for below-fold elements
+  const anim = (v: boolean, r: boolean = true) =>
+    !r || v ? "translate-y-0 opacity-100" : "translate-y-7 opacity-0";
 
   return (
     <>
@@ -139,7 +151,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-b from-primary/60 via-primary/35 to-primary/70" />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent" />
         </div>
-        <div className={`relative z-10 max-w-3xl px-6 text-center transition-all duration-1000 ${anim(heroV.visible)}`}>
+        <div className={`relative z-10 max-w-3xl px-6 text-center transition-all duration-1000 ${anim(heroV.visible, heroV.ready)}`}>
           <p className="mb-6 text-[11px] md:text-[12px] font-medium uppercase tracking-[0.4em] text-accent gold-lines">Est. Lakewood, NJ</p>
           <h1 className="font-heading text-[36px] leading-[1.15] text-white sm:text-5xl md:text-6xl lg:text-7xl">
             Timeless Elegance,<br /><span className="text-gold-gradient">Crafted for You</span>
