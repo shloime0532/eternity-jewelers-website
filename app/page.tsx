@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 
 /* ═══ DATA ═══ */
@@ -43,31 +43,6 @@ const TESTIMONIALS = [
   { text: "I felt no pressure at all \u2014 just genuine expertise and care. They transformed my grandmother\u2019s old gold into a stunning modern piece our family treasures.", author: "David L.", detail: "Custom Redesign" },
 ];
 
-/* ═══ HOOKS ═══ */
-
-/** CSS-based reveal: content visible by default, JS adds animation classes */
-function useReveal(extraClass?: string) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (extraClass) el.classList.add(extraClass);
-    el.classList.add("reveal-ready");
-    const obs = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          el.classList.add("revealed");
-          obs.disconnect();
-        }
-      },
-      { threshold: 0.08, rootMargin: "0px 0px -30px 0px" }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [extraClass]);
-  return ref;
-}
-
 /* ═══ PAGE ═══ */
 
 export default function Home() {
@@ -97,14 +72,6 @@ export default function Home() {
     window.addEventListener("keydown", lbKey);
     return () => window.removeEventListener("keydown", lbKey);
   }, [lbKey]);
-
-  // Reveal refs — content visible by default, JS enhances with scroll animations
-  const galleryRef = useReveal();
-  const servicesRef = useReveal();
-  const aboutLeftRef = useReveal("reveal-left");
-  const aboutRightRef = useReveal("reveal-right");
-  const testimonialsRef = useReveal();
-  const ctaRef = useReveal();
 
   return (
     <>
@@ -137,7 +104,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* HERO — always visible, uses CSS animation */}
+      {/* HERO */}
       <section className="relative flex h-screen min-h-[640px] max-h-[1100px] items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <Image src="/images/hero.png" alt="Brilliant diamond ring" fill className="object-cover" priority quality={90} sizes="100vw" />
@@ -168,7 +135,7 @@ export default function Home() {
 
       {/* GALLERY */}
       <section id="collection" className="bg-light py-20 sm:py-24 md:py-28">
-        <div ref={galleryRef} className="mx-auto max-w-7xl px-5 md:px-10">
+        <div className="mx-auto max-w-7xl px-5 md:px-10">
           <div className="mb-14 sm:mb-16 text-center">
             <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-accent">Our Collection</p>
             <h2 className="font-heading text-3xl sm:text-4xl md:text-[42px] text-primary gold-underline">Curated Masterpieces</h2>
@@ -219,7 +186,7 @@ export default function Home() {
 
       {/* SERVICES */}
       <section id="services" className="bg-white py-20 sm:py-24 md:py-28">
-        <div ref={servicesRef} className="mx-auto max-w-7xl px-5 md:px-10">
+        <div className="mx-auto max-w-7xl px-5 md:px-10">
           <div className="mb-14 sm:mb-16 text-center">
             <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-accent">What We Offer</p>
             <h2 className="font-heading text-3xl sm:text-4xl md:text-[42px] text-primary gold-underline">Our Expertise</h2>
@@ -242,14 +209,14 @@ export default function Home() {
       <section id="about" className="bg-primary py-20 sm:py-24 md:py-28 overflow-hidden">
         <div className="mx-auto max-w-7xl px-5 md:px-10">
           <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16 xl:gap-20">
-            <div ref={aboutLeftRef} className="relative">
+            <div className="relative">
               <div className="relative aspect-[4/3] lg:aspect-[3/4] overflow-hidden shadow-2xl">
                 <Image src="/images/showroom.png" alt="Eternity Jewelers showroom" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
               </div>
               <div className="absolute top-4 left-4 h-16 w-16 border-t border-l border-accent/50" />
               <div className="absolute bottom-4 right-4 h-16 w-16 border-b border-r border-accent/50" />
             </div>
-            <div ref={aboutRightRef}>
+            <div>
               <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-accent">Our Story</p>
               <h2 className="font-heading text-3xl sm:text-4xl md:text-[42px] leading-[1.2] text-white">36 Years of<br /><span className="text-gold-gradient">Enduring Craftsmanship</span></h2>
               <div className="mt-5 mb-7 h-px w-16 bg-accent/50" />
@@ -270,7 +237,7 @@ export default function Home() {
 
       {/* TESTIMONIALS */}
       <section id="testimonials" className="bg-light-warm py-20 sm:py-24 md:py-28">
-        <div ref={testimonialsRef} className="mx-auto max-w-4xl px-5 md:px-10">
+        <div className="mx-auto max-w-4xl px-5 md:px-10">
           <div className="mb-14 sm:mb-16 text-center">
             <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-accent">Client Stories</p>
             <h2 className="font-heading text-3xl sm:text-4xl md:text-[42px] text-primary gold-underline">Words of Trust</h2>
@@ -294,7 +261,7 @@ export default function Home() {
       {/* CTA */}
       <section id="contact" className="relative bg-primary py-20 sm:py-24 md:py-28 overflow-hidden">
         <div className="absolute inset-0 opacity-[0.02]"><div className="h-full w-full" style={{ backgroundImage: "radial-gradient(circle at 30% 30%, rgba(201,169,98,0.5) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(201,169,98,0.3) 0%, transparent 50%)" }} /></div>
-        <div ref={ctaRef} className="relative mx-auto max-w-5xl px-5 md:px-10">
+        <div className="relative mx-auto max-w-5xl px-5 md:px-10">
           <div className="text-center">
             <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.35em] text-accent">Visit Our Showroom</p>
             <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl text-white">Begin Your Journey</h2>
