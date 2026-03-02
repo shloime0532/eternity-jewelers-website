@@ -17,12 +17,12 @@ const NAV_LINKS = [
 ];
 
 const COLLECTIONS = [
-  { src: "/images/engagement-ring.png", alt: "Diamond Engagement Ring", label: "Engagement Rings" },
-  { src: "/images/wedding-bands.png", alt: "Gold Wedding Bands", label: "Wedding Bands" },
-  { src: "/images/necklace.png", alt: "Diamond Pendant Necklace", label: "Necklaces" },
-  { src: "/images/watch.png", alt: "Luxury Gold Watch", label: "Luxury Watches" },
-  { src: "/images/earrings.png", alt: "Diamond Drop Earrings", label: "Earrings" },
-  { src: "/images/bracelet.png", alt: "Diamond Tennis Bracelet", label: "Bracelets" },
+  { src: "/images/gallery-1.png", alt: "Diamond Engagement Ring", label: "Engagement Rings" },
+  { src: "/images/gallery-2.png", alt: "Gold Wedding Bands", label: "Wedding Bands" },
+  { src: "/images/gallery-3.png", alt: "Diamond Pendant Necklace", label: "Necklaces" },
+  { src: "/images/gallery-5.png", alt: "Luxury Gold Watch", label: "Luxury Watches" },
+  { src: "/images/gallery-4.png", alt: "Diamond Tennis Bracelet", label: "Bracelets" },
+  { src: "/images/gallery-6.png", alt: "Master Jeweler at Work", label: "Craftsmanship" },
 ];
 
 const SERVICES = [

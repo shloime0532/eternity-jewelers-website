@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     title: "Eternity Jewelers | Fine Jewelry & Custom Design",
     description:
       "Over 36 years of crafting exquisite custom jewelry in Lakewood, NJ. Visit our showroom today.",
-    images: ["/og-image.jpg"],
+    images: ["/images/og-image.jpg"],
     type: "website",
     locale: "en_US",
     siteName: "Eternity Jewelers",
@@ -35,10 +35,10 @@ export const metadata: Metadata = {
     title: "Eternity Jewelers | Fine Jewelry & Custom Design",
     description:
       "Over 36 years of crafting exquisite custom jewelry in Lakewood, NJ.",
-    images: ["/og-image.jpg"],
+    images: ["/images/og-image.jpg"],
   },
   icons: {
-    icon: "/favicon.png",
+    icon: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
 };
