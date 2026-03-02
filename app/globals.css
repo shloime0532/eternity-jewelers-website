@@ -117,6 +117,35 @@ body {
 }
 .btn-gold:hover::before { left: 100%; }
 
+/* Scroll-reveal system: content visible by default.
+   JS adds .reveal-ready (sets hidden state) then .revealed on intersection. */
+.reveal-ready {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+.reveal-ready.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Slide-in variants for about section */
+.reveal-ready.reveal-left {
+  transform: translateX(-40px);
+}
+.reveal-ready.reveal-right {
+  transform: translateX(40px);
+}
+.reveal-ready.reveal-left.revealed,
+.reveal-ready.reveal-right.revealed {
+  transform: translateX(0);
+}
+/* Stagger children */
+.reveal-ready .stagger-1 { transition-delay: 80ms; }
+.reveal-ready .stagger-2 { transition-delay: 160ms; }
+.reveal-ready .stagger-3 { transition-delay: 240ms; }
+.reveal-ready .stagger-4 { transition-delay: 320ms; }
+.reveal-ready .stagger-5 { transition-delay: 400ms; }
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #F8F6F2; }

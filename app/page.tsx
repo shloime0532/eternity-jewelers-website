@@ -45,26 +45,29 @@ const TESTIMONIALS = [
 
 /* ═══ HOOKS ═══ */
 
-function useInView(threshold = 0.12) {
+function useInView(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(true); // visible by default (SSR/no-JS fallback)
-  const [ready, setReady] = useState(false); // tracks if JS hydration is done
+  const [visible, setVisible] = useState(true);
+  const [ready, setReady] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    // Check if element is already in viewport
     const rect = el.getBoundingClientRect();
     if (rect.top < window.innerHeight && rect.bottom > 0) {
       setVisible(true);
       setReady(true);
       return;
     }
-    // Not in viewport — hide it, then reveal on scroll
     setVisible(false);
     setReady(true);
     const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
-      { threshold }
+      ([e]) => {
+        if (e.isIntersecting) {
+          setVisible(true);
+          obs.disconnect();
+        }
+      },
+      { threshold, rootMargin: "0px 0px -40px 0px" }
     );
     obs.observe(el);
     return () => obs.disconnect();
